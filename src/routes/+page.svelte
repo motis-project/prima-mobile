@@ -82,11 +82,11 @@
 				</Button>
 			</div>
 			<div class="flex gap-4">
-				<Button class="h-8 grow text-center text-xs font-medium">
+				<Button class="h-8 grow text-center text-sm font-medium">
 					Depart at Thu, Jan 12, 14:21
 					<ChevronDown />
 				</Button>
-				<Button class="h-8  text-center text-xs font-medium">
+				<Button class="h-8  text-center text-sm font-medium">
 					All Modes
 					<ChevronDown />
 				</Button>
