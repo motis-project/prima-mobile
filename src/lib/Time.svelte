@@ -23,10 +23,12 @@
 	const lowDelay = $derived(isRealtime && delayMinutes <= 3);
 </script>
 
-{#if variant == 'schedule'}
-	{formatTime(scheduled)}
-{:else if variant === 'realtime-show-always' || (variant === 'realtime' && isRealtime)}
-	<span class:text-destructive={highDelay} class:text-green-600={lowDelay}>
-		{formatTime(t)}
-	</span>
-{/if}
+<div class={cn('w-16', className)}>
+	{#if variant == 'schedule'}
+		{formatTime(scheduled)}
+	{:else if variant === 'realtime-show-always' || (variant === 'realtime' && isRealtime)}
+		<span class:text-destructive={highDelay} class:text-green-600={lowDelay}>
+			{formatTime(t)}
+		</span>
+	{/if}
+</div>

@@ -15,6 +15,7 @@
 	import { onMount } from 'svelte';
 	import { lngLatToStr } from '$lib/lngLatToStr';
 	import ItineraryList from './ItineraryList.svelte';
+	import ConnectionDetail from './ConnectionDetail.svelte';
 
 	const urlParams = browser ? new URLSearchParams(window.location.search) : undefined;
 
@@ -87,29 +88,26 @@
 		<AddressTypeahead placeholder={t.from} bind:selected={from} items={fromItems} />
 	{:else if page.state.selectTo}
 		<AddressTypeahead placeholder={t.to} bind:selected={to} items={toItems} />
+	{:else if page.state.selectedItinerary}
+		<ConnectionDetail
+			itinerary={page.state.selectedItinerary}
+			onClickStop={(name: string, stopId: string, time: Date) =>
+				pushState('', { stop: { name, stopId, time } })}
+			onClickTrip={(tripId: string) => pushState('', { tripId })}
+		/>
 	{:else}
 		<div class="flex h-full flex-col gap-4">
 			<div class="relative flex flex-col gap-4">
 				<Input
 					placeholder={t.from}
 					class="text-sm"
-					onfocus={() => {
-						pushState('', {
-							selectFrom: true,
-							selectTo: false
-						});
-					}}
+					onfocus={() => pushState('', { selectFrom: true })}
 					value={from.label}
 				/>
 				<Input
 					placeholder={t.to}
 					class="text-sm"
-					onfocus={() => {
-						pushState('', {
-							selectFrom: false,
-							selectTo: true
-						});
-					}}
+					onfocus={() => pushState('', { selectTo: true })}
 					value={to.label}
 				/>
 				<Button
@@ -143,9 +141,7 @@
 					{baseQuery}
 					{baseResponse}
 					{routingResponses}
-					selectItinerary={(it: Itinerary) => {
-						console.log('select');
-					}}
+					selectItinerary={(it: Itinerary) => pushState('', { selectedItinerary: it })}
 				/>
 			</div>
 		</div>
