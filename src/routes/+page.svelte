@@ -7,7 +7,7 @@
 	import { plan, trip, type Match, type PlanData, type PlanResponse } from '$lib/openapi';
 	import { pushState } from '$app/navigation';
 	import { page } from '$app/state';
-	import { Button } from '$lib/components/ui/button';
+	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import ArrowUpDown from 'lucide-svelte/icons/arrow-up-down';
 	import { ChevronDown } from 'lucide-svelte';
 	import { onMount } from 'svelte';
@@ -15,6 +15,11 @@
 	import ItineraryList from './ItineraryList.svelte';
 	import ConnectionDetail from './ConnectionDetail.svelte';
 	import StopTimes from './StopTimes.svelte';
+	import { cn } from '$lib/utils';
+	import { Calendar } from '$lib/components/ui/calendar';
+	import * as RadioGroup from '$lib/components/ui/radio-group';
+	import * as Drawer from '$lib/components/ui/drawer';
+	import { Label } from '$lib/components/ui/label';
 
 	const urlParams = browser ? new URLSearchParams(window.location.search) : undefined;
 
@@ -142,10 +147,45 @@
 				</Button>
 			</div>
 			<div class="flex gap-4">
-				<Button class="h-8 grow gap-1 text-center text-sm font-medium">
-					Abfahrt Do, Jan 12, 14:21
-					<ChevronDown />
-				</Button>
+				<Drawer.Root>
+					<Drawer.Trigger
+						class={cn(
+							buttonVariants({ variant: 'default' }),
+							'h-8 grow gap-1 text-center text-sm font-medium'
+						)}
+					>
+						Abfahrt Do, Jan 12, 14:21
+						<ChevronDown />
+					</Drawer.Trigger>
+					<Drawer.Portal>
+						<Drawer.Overlay class="fixed inset-0 bg-black/40" />
+						<Drawer.Content>
+							<RadioGroup.Root
+								value="card"
+								class="grid h-9 grid-cols-2 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground"
+							>
+								<Label
+									for="card"
+									class="inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-1 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&:has([data-state=checked])]:bg-background [&:has([data-state=checked])]:text-foreground [&:has([data-state=checked])]:shadow"
+								>
+									<RadioGroup.Item value="card" id="card" class="sr-only" aria-label="Card" />
+									{t.departure}
+								</Label>
+								<Label
+									for="paypal"
+									class="inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-1 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&:has([data-state=checked])]:bg-background [&:has([data-state=checked])]:text-foreground [&:has([data-state=checked])]:shadow"
+								>
+									<RadioGroup.Item value="paypal" id="paypal" class="sr-only" aria-label="Paypal" />
+									{t.arrival}
+								</Label>
+							</RadioGroup.Root>
+							<div class="flex w-full justify-center">
+								<Calendar class="w-fit" />
+							</div>
+						</Drawer.Content>
+					</Drawer.Portal>
+				</Drawer.Root>
+
 				<Button class="h-8  gap-1 text-center text-sm font-medium">
 					All Modes
 					<ChevronDown />
