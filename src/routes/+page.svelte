@@ -4,18 +4,17 @@
 	import { type Location } from '$lib/Location';
 	import { Input } from '$lib/components/ui/input';
 	import { t } from '$lib/i18n/translation';
-	import { plan, type Itinerary, type Match, type PlanData, type PlanResponse } from '$lib/openapi';
+	import { plan, trip, type Match, type PlanData, type PlanResponse } from '$lib/openapi';
 	import { pushState } from '$app/navigation';
 	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui/button';
 	import ArrowUpDown from 'lucide-svelte/icons/arrow-up-down';
-	import { ChevronDown, ChevronUp } from 'lucide-svelte';
-	import { Separator } from '$lib/components/ui/separator';
-	import * as Card from '$lib/components/ui/card';
+	import { ChevronDown } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { lngLatToStr } from '$lib/lngLatToStr';
 	import ItineraryList from './ItineraryList.svelte';
 	import ConnectionDetail from './ConnectionDetail.svelte';
+	import StopTimes from './StopTimes.svelte';
 
 	const urlParams = browser ? new URLSearchParams(window.location.search) : undefined;
 
@@ -81,6 +80,15 @@
 			connectionsEl.scrollTop = 48;
 		}
 	});
+
+	const onClickTrip = async (tripId: string) => {
+		const { data: itinerary, error } = await trip({ query: { tripId } });
+		if (error) {
+			alert(error);
+			return;
+		}
+		pushState('', { selectedItinerary: itinerary });
+	};
 </script>
 
 <div class="h-screen p-2">
@@ -93,7 +101,14 @@
 			itinerary={page.state.selectedItinerary}
 			onClickStop={(name: string, stopId: string, time: Date) =>
 				pushState('', { stop: { name, stopId, time } })}
-			onClickTrip={(tripId: string) => pushState('', { tripId })}
+			{onClickTrip}
+		/>
+	{:else if page.state.stop}
+		<StopTimes
+			arriveBy={false}
+			time={page.state.stop.time}
+			stopId={page.state.stop.stopId}
+			{onClickTrip}
 		/>
 	{:else}
 		<div class="flex h-full flex-col gap-4">
@@ -141,7 +156,7 @@
 					{baseQuery}
 					{baseResponse}
 					{routingResponses}
-					selectItinerary={(it: Itinerary) => pushState('', { selectedItinerary: it })}
+					selectItinerary={(selectedItinerary) => pushState('', { selectedItinerary })}
 				/>
 			</div>
 		</div>
