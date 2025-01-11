@@ -26,9 +26,11 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: latest
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run build
+          cache: 'yarn'
+      - run:
+          npm install -g yarn
+          yarn set version berry
+          yarn build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
