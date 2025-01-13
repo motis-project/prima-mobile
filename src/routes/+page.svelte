@@ -96,7 +96,7 @@
 	};
 </script>
 
-<div class="h-dvh w-dvw overscroll-none p-2">
+<div class="h-dvh overscroll-none p-2">
 	{#if page.state.selectFrom}
 		<AddressTypeahead placeholder={t.from} bind:selected={from} items={fromItems} />
 	{:else if page.state.selectTo}
