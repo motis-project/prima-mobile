@@ -782,6 +782,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sveltejs/adapter-static@npm:^3.0.8":
+  version: 3.0.8
+  resolution: "@sveltejs/adapter-static@npm:3.0.8"
+  peerDependencies:
+    "@sveltejs/kit": ^2.0.0
+  checksum: 10c0/0ae958463d074c49b733059f53b685ee26e0debe9207aad5d77ea1b651a1efc743647f9c0cf78d72ae0243e23ece4b620b0600f17ec83e732791a265fea6df4f
+  languageName: node
+  linkType: hard
+
 "@sveltejs/kit@npm:^2.0.0":
   version: 2.15.2
   resolution: "@sveltejs/kit@npm:2.15.2"
@@ -3542,6 +3551,7 @@ __metadata:
     "@internationalized/date": "npm:^3.6.0"
     "@playwright/test": "npm:^1.45.3"
     "@sveltejs/adapter-node": "npm:^5.2.9"
+    "@sveltejs/adapter-static": "npm:^3.0.8"
     "@sveltejs/kit": "npm:^2.0.0"
     "@sveltejs/vite-plugin-svelte": "npm:^4.0.0"
     "@types/pg": "npm:^8.11.10"
