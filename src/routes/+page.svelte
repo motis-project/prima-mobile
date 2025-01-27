@@ -9,7 +9,7 @@
 	import { page } from '$app/state';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import ArrowUpDown from 'lucide-svelte/icons/arrow-up-down';
-	import { ChevronDown } from 'lucide-svelte';
+	import { ChevronDown, RouteIcon, TicketIcon, UserIcon } from 'lucide-svelte';
 	import { onMount, tick } from 'svelte';
 	import { lngLatToStr } from '$lib/lngLatToStr';
 	import ItineraryList from './ItineraryList.svelte';
@@ -153,7 +153,8 @@
 	};
 </script>
 
-<div class="h-dvh overscroll-none p-2">
+<div class="h-dvh overscroll-none flex flex-col">
+<div class="grow p-2 overflow-y-scroll overflow-x-hidden">
 	{#if page.state.selectFrom}
 		<AddressTypeahead placeholder={t.from} bind:selected={from} items={fromItems} />
 	{:else if page.state.selectTo}
@@ -265,4 +266,34 @@
 			</div>
 		</div>
 	{/if}
+</div>
+<div class="flex justify-around">
+	<Button
+			size="lg"
+			class="w-full h-20 flex-col justify-evenly gap-0 rounded-none"
+			variant="secondary"
+			onclick={() => pushState('?', {})}
+		>
+			<RouteIcon class="h-[1.2rem] w-[1.2rem]" />
+			<div>Journeys</div>
+	</Button>
+	<Button
+			size="lg"
+			class="w-full h-20 flex-col justify-evenly gap-0 rounded-none"
+			variant="secondary"
+			onclick={() => pushState('?', {})}
+		>
+			<TicketIcon class="h-[1.2rem] w-[1.2rem]" />
+			<div>Tickets</div>
+	</Button>
+	<Button
+			size="lg"
+			class="w-full h-20 flex-col justify-evenly gap-0 rounded-none"
+			variant="secondary"
+			onclick={() => pushState('?', {})}
+		>
+			<UserIcon class="h-[1.2rem] w-[1.2rem]" />
+			<div>Account</div>
+	</Button>
+</div>
 </div>
