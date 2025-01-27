@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import AddressTypeahead from '$lib/AddressTypeahead.svelte';
+	import AddressTypeahead from './AddressTypeahead.svelte';
 	import { type Location } from '$lib/Location';
 	import { Input } from '$lib/components/ui/input';
 	import { t } from '$lib/i18n/translation';
@@ -12,7 +12,7 @@
 	import { ChevronDown } from 'lucide-svelte';
 	import { onMount, tick } from 'svelte';
 	import { lngLatToStr } from '$lib/lngLatToStr';
-	import ItineraryList from '$lib/ItineraryList.svelte';
+	import ItineraryList from './ItineraryList.svelte';
 	import ConnectionDetail from '$lib/ConnectionDetail.svelte';
 	import StopTimes from '$lib/StopTimes.svelte';
 	import { cn } from '$lib/utils';

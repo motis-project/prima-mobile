@@ -9,7 +9,7 @@
 	import { t } from '$lib/i18n/translation';
 	import { Button } from '$lib/components/ui/button';
 	import type { RequestResult } from '@hey-api/client-fetch';
-	import ErrorMessage from './ErrorMessage.svelte';
+	import ErrorMessage from '$lib/ErrorMessage.svelte';
 
 	let {
 		routingResponses,

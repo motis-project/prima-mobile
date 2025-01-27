@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { Combobox } from 'bits-ui';
-	import { geocode, type Match } from './openapi';
+	import { geocode, type Match } from '$lib/openapi';
 	import Bus from 'lucide-svelte/icons/bus-front';
 	import House from 'lucide-svelte/icons/map-pin-house';
 	import Place from 'lucide-svelte/icons/map-pin';
 	import { posToLocation, type Location } from '$lib/Location';
-	import { GEOCODER_PRECISION } from './Precision';
-	import { language } from './i18n/translation';
+	import { GEOCODER_PRECISION } from '$lib/Precision';
+	import { language } from '$lib/i18n/translation';
 
 	const COORD_LVL_REGEX = /^([+-]?\d+(\.\d+)?)\s*,\s*([+-]?\d+(\.\d+)?)\s*,\s*([+-]?\d+(\.\d+)?)$/;
 	const COORD_REGEX = /^([+-]?\d+(\.\d+)?)\s*,\s*([+-]?\d+(\.\d+)?)$/;
