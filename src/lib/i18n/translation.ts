@@ -2,6 +2,7 @@ import { browser } from '$app/environment';
 import en from './en';
 import de from './de';
 import fr from './fr';
+import pl from './pl';
 
 export type Translations = {
 	journeyDetails: string;
@@ -29,13 +30,15 @@ export type Translations = {
 	tripIntermediateStops: (n: number) => string;
 	sharingProvider: string;
 	roundtripStationReturnConstraint: string;
+	noItinerariesFound: string;
 };
 
 const translations: Map<string, Translations> = new Map(
 	Object.entries({
 		en,
 		de,
-		fr
+		fr,
+		pl
 	})
 );
 

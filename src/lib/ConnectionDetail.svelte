@@ -1,7 +1,7 @@
 <script lang="ts">
 	import ArrowRight from 'lucide-svelte/icons/arrow-right';
 	import type { Itinerary, Leg } from '$lib/openapi';
-	import Time from './Time.svelte';
+	import Time from '$lib/Time.svelte';
 	import { routeBorderColor, routeColor } from '$lib/modeStyle';
 	import { formatDurationSec, formatDistanceMeters } from '$lib/formatDuration';
 	import { Button } from '$lib/components/ui/button';
@@ -31,15 +31,21 @@
 )}
 	<Time
 		variant="schedule"
-		class="mr-2 font-semibold"
+		class="font-semibold w-16"
 		{isRealtime}
 		{timestamp}
 		{scheduledTimestamp}
 	/>
-	<Time variant="realtime" class="font-semibold" {isRealtime} {timestamp} {scheduledTimestamp} />
+	<Time
+		variant="realtime"
+		class="font-semibold w-16"
+		{isRealtime}
+		{timestamp}
+		{scheduledTimestamp}
+	/>
 	{#if stopId}
 		<Button
-			class="col-span-5 mr-6 justify-normal text-wrap text-left text-lg"
+			class="text-[length:inherit] leading-none justify-normal text-wrap text-left"
 			variant="link"
 			onclick={() => {
 				onClickStop(name, stopId, new Date(timestamp));
@@ -48,12 +54,12 @@
 			{name}
 		</Button>
 	{:else}
-		<span class="col-span-5 mr-6">{name}</span>
+		<span>{name}</span>
 	{/if}
 {/snippet}
 
 {#snippet streetLeg(l: Leg)}
-	<div class="flex flex-col gap-y-4 py-12 pl-8 text-muted-foreground">
+	<div class="py-12 pl-8 flex flex-col gap-y-4 text-muted-foreground">
 		<span class="ml-6">
 			{formatDurationSec(l.duration)}
 			{getModeName(l)}
@@ -72,7 +78,7 @@
 	</div>
 {/snippet}
 
-<div class="p-2 pb-4 text-lg">
+<div class="text-lg">
 	{#each itinerary.legs as l, i}
 		{@const isLast = i == itinerary.legs.length - 1}
 		{@const isLastPred = i == itinerary.legs.length - 2}
@@ -80,11 +86,11 @@
 		{@const next = isLast ? undefined : itinerary.legs[i + 1]}
 
 		{#if l.routeShortName}
-			<div class="flex w-full items-center justify-between space-x-1">
+			<div class="w-full flex justify-between items-center space-x-1">
 				<Route {onClickTrip} {l} />
 				{#if pred && (pred.from.track || pred.duration !== 0)}
-					<div class="h-0 w-full border-t"></div>
-					<div class="text-nowrap px-2 text-sm text-muted-foreground">
+					<div class="border-t h-0 grow shrink"></div>
+					<div class="text-sm text-muted-foreground leading-none px-2">
 						{#if pred.from.track}
 							{t.arrivalOnTrack} {pred.from.track}{pred.duration ? ',' : ''}
 						{/if}
@@ -96,17 +102,17 @@
 						{/if}
 					</div>
 				{/if}
-				<div class="h-0 w-full border-t"></div>
+				<div class="border-t h-0 grow shrink"></div>
 				{#if l.from.track}
-					<div class="text-nowrap rounded-xl border px-2">
+					<div class="text-nowrap border rounded-xl px-2">
 						{t.track}
 						{l.from.track}
 					</div>
 				{/if}
 			</div>
 
-			<div class="ml-4 border-l-4 pl-4 pt-4" style={routeBorderColor(l)}>
-				<div class="grid grid-cols-7 items-center gap-y-6">
+			<div class="pt-4 pl-6 border-l-4 left-4 relative" style={routeBorderColor(l)}>
+				<div class="grid gap-y-6 grid-cols-[max-content_max-content_auto] items-center">
 					{@render stopTimes(
 						l.startTime,
 						l.scheduledStartTime,
@@ -115,19 +121,17 @@
 						l.from.stopId
 					)}
 				</div>
-				{#if l.headsign}
-					<div class="mt-2 flex items-center text-muted-foreground">
-						<ArrowRight class="h-4 w-4 stroke-muted-foreground" />
-						<span class="ml-1">{l.headsign}</span>
-					</div>
-				{/if}
+				<div class="mt-2 flex items-center text-muted-foreground leading-none">
+					<ArrowRight class="stroke-muted-foreground h-4 w-4" />
+					<span class="ml-1">{l.headsign}</span>
+				</div>
 				{#if l.intermediateStops?.length === 0}
-					<div class="flex items-center py-12 pl-8 text-muted-foreground">
+					<div class="py-8 pl-1 md:pl-4 flex items-center text-muted-foreground">
 						{t.tripIntermediateStops(0)}
 					</div>
 				{:else}
-					<details class="[&_svg]:open:-rotate-180">
-						<summary class="flex items-center py-12 pl-4 text-muted-foreground">
+					<details class="[&_svg]:open:-rotate-180 my-2">
+						<summary class="py-8 pl-1 md:pl-4 flex items-center text-muted-foreground">
 							<svg
 								class="rotate-0 transform transition-all duration-300"
 								fill="none"
@@ -141,12 +145,12 @@
 							>
 								<polyline points="6 9 12 15 18 9"></polyline>
 							</svg>
-							<span class="ml-4 cursor-pointer">
-								{t.tripIntermediateStops(l.intermediateStops?.length ?? 0)}<br />
+							<span class="ml-2 cursor-pointer">
+								{t.tripIntermediateStops(l.intermediateStops?.length ?? 0)}
 								({formatDurationSec(l.duration)})
 							</span>
 						</summary>
-						<div class="mb-6 grid grid-cols-7 items-center gap-y-6">
+						<div class="mb-1 grid gap-y-4 grid-cols-[max-content_max-content_auto] items-center">
 							{#each l.intermediateStops! as s}
 								{@render stopTimes(s.arrival!, s.scheduledArrival!, l.realTime, s.name!, s.stopId)}
 							{/each}
@@ -155,7 +159,7 @@
 				{/if}
 
 				{#if !isLast && !(isLastPred && next!.duration === 0)}
-					<div class="grid grid-cols-7 items-center gap-y-6 pb-3">
+					<div class="grid gap-y-6 grid-cols-[max-content_max-content_auto] items-center pb-3">
 						{@render stopTimes(
 							l.endTime!,
 							l.scheduledEndTime!,
@@ -166,15 +170,15 @@
 					</div>
 				{/if}
 
-				{#if isLast}
+				{#if isLast || (isLastPred && next!.duration === 0)}
 					<!-- fill visual gap -->
 					<div class="pb-2"></div>
 				{/if}
 			</div>
 		{:else if !(isLast && l.duration === 0) && ((i == 0 && l.duration !== 0) || !next || !next.routeShortName || l.mode != 'WALK' || (pred && (pred.mode == 'BIKE' || pred.mode == 'RENTAL')))}
 			<Route {onClickTrip} {l} />
-			<div class="relative left-4 border-l-4 pl-6 pt-4" style={routeBorderColor(l)}>
-				<div class="grid grid-cols-7 items-center gap-y-6">
+			<div class="pt-4 pl-6 border-l-4 left-4 relative" style={routeBorderColor(l)}>
+				<div class="grid gap-y-6 grid-cols-[max-content_max-content_auto] items-center">
 					{@render stopTimes(
 						l.startTime,
 						l.scheduledStartTime,
@@ -185,19 +189,21 @@
 				</div>
 				{@render streetLeg(l)}
 				{#if !isLast}
-					<div class="grid grid-cols-7 items-center gap-y-6 pb-4">
+					<div class="grid gap-y-6 grid-cols-[max-content_max-content_auto] items-center pb-4">
 						{@render stopTimes(l.endTime, l.scheduledEndTime, l.realTime, l.to.name, l.to.stopId)}
 					</div>
 				{/if}
 			</div>
 		{/if}
 	{/each}
-	<div class="flex">
+	<div class="relative pl-6 left-4">
 		<div
-			class="relative left-[11.5px] h-3 w-3 shrink-0 rounded-full pt-2"
+			class="absolute left-[-6px] top-[0px] w-[15px] h-[15px] rounded-full"
 			style={routeColor(lastLeg!)}
 		></div>
-		<div class="relative bottom-[7px] left-3 grid grid-cols-7 items-center gap-y-6 pl-4">
+		<div
+			class="relative left-[2.5px] bottom-[7px] grid gap-y-6 grid-cols-[max-content_max-content_auto] items-center"
+		>
 			{@render stopTimes(
 				lastLeg!.endTime,
 				lastLeg!.scheduledEndTime,

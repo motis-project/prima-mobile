@@ -12,12 +12,12 @@
 		onClickTrip: (tripId: string) => void;
 	} = $props();
 
-	const modeIcon = getModeStyle(l)[0];
+	const modeIcon = $derived(getModeStyle(l)[0]);
 </script>
 
 <button
 	class={cn(
-		'flex h-8 items-center text-nowrap rounded-full pl-2 pr-1 font-bold',
+		'flex items-center text-nowrap rounded-full pl-2 pr-1 h-8 font-bold',
 		className,
 		l.routeShortName ? 'pr-3' : undefined
 	)}
@@ -30,7 +30,7 @@
 		}
 	}}
 >
-	<svg class="relative mr-2 max-h-6 min-h-6 min-w-6 max-w-6 rounded-full">
+	<svg class="relative mr-2 min-w-6 min-h-6 max-w-6 max-h-6 rounded-full">
 		<use xlink:href={`#${modeIcon}`}></use>
 	</svg>
 	<div class="text-center">

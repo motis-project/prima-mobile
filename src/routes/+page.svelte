@@ -5,12 +5,12 @@
 	import { Input } from '$lib/components/ui/input';
 	import { t } from '$lib/i18n/translation';
 	import { plan, trip, type Match, type PlanData, type PlanResponse } from '$lib/openapi';
-	import { pushState } from '$app/navigation';
+	import { pushState, replaceState } from '$app/navigation';
 	import { page } from '$app/state';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import ArrowUpDown from 'lucide-svelte/icons/arrow-up-down';
 	import { ChevronDown } from 'lucide-svelte';
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { lngLatToStr } from '$lib/lngLatToStr';
 	import ItineraryList from '$lib/ItineraryList.svelte';
 	import ConnectionDetail from '$lib/ConnectionDetail.svelte';
@@ -67,32 +67,89 @@
 	type Timeout = ReturnType<typeof setTimeout>;
 	let baseResponse = $state<Promise<PlanResponse>>();
 	let routingResponses = $state<Array<Promise<PlanResponse>>>([]);
+	let stopNameFromResponse = $state<string>('');
 	let searchDebounceTimer: Timeout;
 	$effect(() => {
 		if (baseQuery) {
 			clearTimeout(searchDebounceTimer);
 			searchDebounceTimer = setTimeout(() => {
-				const base = plan<true>(baseQuery).then((response) => response.data);
+				const base = plan(baseQuery).then((response) => {
+					if (response.error) throw new Error(String(response.error));
+					return response.data!;
+				});
 				baseResponse = base;
 				routingResponses = [base];
+				replaceState('?', {});
 			}, 400);
 		}
 	});
 
 	let connectionsEl = $state<HTMLDivElement>();
-	onMount(() => {
+	onMount(async () => {
 		if (connectionsEl) {
 			connectionsEl.scrollTop = 48;
 		}
+		await tick();
+		applyPageStateFromURL();
 	});
 
-	const onClickTrip = async (tripId: string) => {
+	const applyPageStateFromURL = () => {
+		if (browser && urlParams) {
+			if (urlParams.has('tripId')) {
+				onClickTrip(urlParams.get('tripId')!, true);
+			}
+			if (urlParams.has('stopId')) {
+				const time = urlParams.has('time') ? new Date(urlParams.get('time')!) : new Date();
+				onClickStop(
+					'',
+					urlParams.get('stopId')!,
+					time,
+					urlParams.get('stopArriveBy') == 'true',
+					true
+				);
+			}
+		}
+	};
+
+	const pushStateWithQueryString = (
+		// eslint-disable-next-line
+		queryParams: Record<string, any>,
+		// eslint-disable-next-line
+		newState: App.PageState,
+		replace: boolean = false
+	) => {
+		const params = new URLSearchParams(queryParams);
+		const updateState = replace ? replaceState : pushState;
+		updateState('?' + params.toString(), newState);
+	};
+
+	const onClickStop = (
+		name: string,
+		stopId: string,
+		time: Date,
+		arriveBy: boolean = false,
+		replace: boolean = false
+	) => {
+		pushStateWithQueryString(
+			{ stopArriveBy: arriveBy, stopId, time: time.toISOString() },
+			{
+				stopArriveBy: arriveBy,
+				selectedStop: { name, stopId, time },
+				selectedItinerary: undefined,
+				tripId: page.state.tripId
+			},
+			replace
+		);
+	};
+
+	const onClickTrip = async (tripId: string, replace: boolean = false) => {
 		const { data: itinerary, error } = await trip({ query: { tripId } });
 		if (error) {
-			alert(error);
+			console.log(error);
+			alert(String((error as Record<string, unknown>).error ?? error));
 			return;
 		}
-		pushState('', { selectedItinerary: itinerary });
+		pushStateWithQueryString({ tripId }, { selectedItinerary: itinerary, tripId: tripId }, replace);
 	};
 </script>
 
@@ -104,15 +161,22 @@
 	{:else if page.state.selectedItinerary}
 		<ConnectionDetail
 			itinerary={page.state.selectedItinerary}
-			onClickStop={(name: string, stopId: string, time: Date) =>
-				pushState('', { stop: { name, stopId, time } })}
+			{onClickStop}
 			{onClickTrip}
 		/>
-	{:else if page.state.stop}
+	{:else if page.state.selectedStop}
 		<StopTimes
-			arriveBy={false}
-			time={page.state.stop.time}
-			stopId={page.state.stop.stopId}
+			stopId={page.state.selectedStop.stopId}
+			time={page.state.selectedStop.time}
+			bind:stopNameFromResponse
+			arriveBy={page.state.stopArriveBy}
+			setArriveBy={(arriveBy) =>
+				onClickStop(
+					page.state.selectedStop!.name,
+					page.state.selectedStop!.stopId,
+					page.state.selectedStop!.time,
+					arriveBy
+				)}
 			{onClickTrip}
 		/>
 	{:else}

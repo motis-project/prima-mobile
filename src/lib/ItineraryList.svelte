@@ -3,11 +3,13 @@
 	import { Separator } from '$lib/components/ui/separator';
 	import { formatDurationSec } from '$lib/formatDuration';
 	import { getModeStyle, routeColor } from '$lib/modeStyle';
-	import { plan, type Itinerary, type Leg, type PlanData, type PlanResponse } from '$lib/openapi';
+	import { plan, type Itinerary, type Leg, type PlanData, type PlanError, type PlanResponse } from '$lib/openapi';
 	import Time from '$lib/Time.svelte';
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 	import { t } from '$lib/i18n/translation';
 	import { Button } from '$lib/components/ui/button';
+	import type { RequestResult } from '@hey-api/client-fetch';
+	import ErrorMessage from './ErrorMessage.svelte';
 
 	let {
 		routingResponses,
@@ -20,6 +22,16 @@
 		baseQuery: PlanData | undefined;
 		selectItinerary: (it: Itinerary) => void;
 	} = $props();
+
+	const throwOnError = (promise: RequestResult<PlanResponse, PlanError, false>) =>
+		promise.then((response) => {
+			console.log(response.error);
+			if (response.error)
+				throw new Error(
+					String((response.error as Record<string, unknown>).error ?? response.error)
+				);
+			return response.data!;
+		});
 </script>
 
 {#snippet legSummary(l: Leg)}
@@ -56,15 +68,15 @@
 							<div class="flex w-full items-center justify-between space-x-4">
 								<div class="h-0 w-full border-t"></div>
 								<Button
-									class="h-8"
+									class="h-8 text-nowrap"
 									variant="outline"
 									onclick={() => {
 										routingResponses.splice(
 											0,
 											0,
-											plan({
+											throwOnError(plan({
 												query: { ...baseQuery.query, pageCursor: r.previousPageCursor }
-											}).then((x) => x.data!)
+											}))
 										);
 									}}
 								>
@@ -111,13 +123,11 @@
 							<div class="flex w-full items-center justify-between space-x-4">
 								<div class="h-0 w-full border-t"></div>
 								<Button
-									class="h-8"
+									class="h-8 text-nowrap"
 									variant="outline"
 									onclick={() => {
 										routingResponses.push(
-											plan({ query: { ...baseQuery.query, pageCursor: r.nextPageCursor } }).then(
-												(x) => x.data!
-											)
+											throwOnError(plan({ query: { ...baseQuery.query, pageCursor: r.nextPageCursor } }))
 										);
 									}}
 								>
@@ -127,10 +137,14 @@
 							</div>
 						{/if}
 					{:catch e}
-						<div>Error: {e}</div>
+						<ErrorMessage {e} />
 					{/await}
 				{/each}
 			</div>
+		{:else if r.direct.length === 0}
+			<ErrorMessage e={t.noItinerariesFound} />
 		{/if}
+	{:catch e}
+		<ErrorMessage {e} />
 	{/await}
 {/if}
