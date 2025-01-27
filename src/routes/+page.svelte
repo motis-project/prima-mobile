@@ -12,9 +12,9 @@
 	import { ChevronDown } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { lngLatToStr } from '$lib/lngLatToStr';
-	import ItineraryList from './ItineraryList.svelte';
-	import ConnectionDetail from './ConnectionDetail.svelte';
-	import StopTimes from './StopTimes.svelte';
+	import ItineraryList from '$lib/ItineraryList.svelte';
+	import ConnectionDetail from '$lib/ConnectionDetail.svelte';
+	import StopTimes from '$lib/StopTimes.svelte';
 	import { cn } from '$lib/utils';
 	import { Calendar } from '$lib/components/ui/calendar';
 	import * as RadioGroup from '$lib/components/ui/radio-group';
